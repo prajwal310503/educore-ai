@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model User {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String        @unique
+  password      String?
+  role          Role          @default(STUDENT)
+  image         String?
+  emailVerified DateTime?
+  isSuspended   Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  enrollments   Enrollment[]
+  courses       Course[]      @relation("InstructorCourses")
+  submissions   Submission[]
+  chatMessages  ChatMessage[]
+  chatSessions  ChatSession[]
+
+  @@index([role])
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Course {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String
+  thumbnail    String?
+  price        Float       @default(0)
+  isPublished  Boolean     @default(false)
+  isDeleted    Boolean     @default(false)
+  instructorId String      @db.ObjectId
+  category     String
+  tags         String[]
+  level        Level       @default(BEGINNER)
+  language     String      @default("English")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  instructor   User        @relation("InstructorCourses", fields: [instructorId], references: [id])
+  chapters     Chapter[]
+  enrollments  Enrollment[]
+  quizzes      Quiz[]
+
+  @@index([instructorId])
+  @@index([isPublished])
+  @@index([isDeleted])
+  @@index([category])
+}
+
+model Chapter {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  videoUrl    String?
+  aiSummary   String?
+  order       Int
+  isPublished Boolean   @default(false)
+  courseId    String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    Progress[]
+
+  @@index([courseId])
+  @@index([order])
+}
+
+model Enrollment {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  courseId    String    @db.ObjectId
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    Progress[]
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model Progress {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String     @db.ObjectId
+  chapterId    String     @db.ObjectId
+  enrollmentId String     @db.ObjectId
+  isCompleted  Boolean    @default(false)
+  completedAt  DateTime?
+
+  chapter      Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chapterId])
+  @@index([enrollmentId])
+}
+
+model Quiz {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  courseId    String      @db.ObjectId
+  timeLimit   Int?
+  aiGenerated Boolean     @default(false)
+  retakeLimit Int         @default(3)
+  createdAt   DateTime    @default(now())
+
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  submissions Submission[]
+
+  @@index([courseId])
+}
+
+model Question {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  text          String
+  options       String[]
+  correctAnswer Int
+  explanation   String?
+  quizId        String   @db.ObjectId
+
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+}
+
+model Submission {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  quizId      String   @db.ObjectId
+  answers     Json
+  score       Float
+  aiFeedback  String?
+  timeTaken   Int?
+  submittedAt DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([quizId])
+}
+
+model ChatSession {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String        @db.ObjectId
+  courseId  String        @db.ObjectId
+  name      String        @default("New Chat")
+  createdAt DateTime      @default(now())
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+
+  @@index([userId, courseId])
+}
+
+model ChatMessage {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String       @db.ObjectId
+  courseId    String?      @db.ObjectId
+  sessionId   String?      @db.ObjectId
+  role        String
+  content     String
+  createdAt   DateTime     @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session     ChatSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([sessionId])
+}
