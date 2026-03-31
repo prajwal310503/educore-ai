@@ -29,7 +29,7 @@ CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code b
     "explanation": "Why this answer is correct and others are wrong"
   }
 ]`,
-      maxOutputTokens: 3000,
+      maxTokens: 3000,
     })
 
     const cleaned = text.replace(/```json\n?|\n?```|```/g, '').trim()

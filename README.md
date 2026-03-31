@@ -87,7 +87,7 @@ Instructors can create and manage their own courses, chapters, and quizzes.
 
 | Name | Email |
 |---|---|
-| Prajwal Mulik | prajwalmulik3106@gmail.com |Prajwal@31
+| Prajwal Mulik | prajwalmulik3106@gmail.com |
 | Arjun Mehta | arjun.mehta@student.ai |
 | Sophie Laurent | sophie.laurent@student.ai |
 | James Wilson | james.wilson@student.ai |
