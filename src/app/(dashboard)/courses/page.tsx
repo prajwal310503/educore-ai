@@ -168,6 +168,7 @@ function CoursesContent() {
   }, [search, selectedCategory, selectedLevel])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1)
   }, [search, selectedCategory, selectedLevel])
 

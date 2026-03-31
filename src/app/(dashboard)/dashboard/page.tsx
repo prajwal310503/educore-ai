@@ -362,7 +362,7 @@ export default async function DashboardPage() {
             <h1 className="text-3xl font-bold">
               <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">My</span> Dashboard
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm">Welcome back, {session.user.name?.split(' ')[0]}! Here's your overview.</p>
+            <p className="text-muted-foreground mt-1 text-sm">Welcome back, {session.user.name?.split(' ')[0]}! Here&apos;s your overview.</p>
           </div>
           <Link href="/instructor/courses/new">
             <button className="btn-shimmer bg-gradient-to-r from-indigo-500 to-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all flex items-center gap-2">

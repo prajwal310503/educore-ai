@@ -1886,7 +1886,7 @@ async function main() {
       })
     }
 
-    ;(course as any)._chapters = chapterRecords
+    ;(course as Record<string, unknown>)._chapters = chapterRecords
   }
 
   // ── Enrollments + progress + submissions ──────────────────────────────────
@@ -1912,7 +1912,7 @@ async function main() {
   for (const plan of enrollmentPlan) {
     const student = studentRecords[plan.studentIdx]
     const course = courseRecords[plan.courseIdx]
-    const chapters = (course as any)._chapters as { id: string }[]
+    const chapters = (course as Record<string, unknown>)._chapters as { id: string }[]
     const enrolledAt = enrollmentDatePool[enrollIdx % enrollmentDatePool.length]
     enrollIdx++
 

@@ -31,7 +31,7 @@ Return ONLY a JSON array of strings:
 ["Key point 1", "Key point 2", ...]
 
 Content: ${chapter.content.slice(0, 4000)}`,
-      maxTokens: 512,
+      maxOutputTokens: 512,
     })
 
     const cleaned = text.replace(/```json\n?|\n?```|```/g, '').trim()

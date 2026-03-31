@@ -57,7 +57,7 @@ Guidelines:
 - Break complex topics into digestible steps
 - Keep responses focused and practical`,
       prompt: message,
-      maxTokens: 1024,
+      maxOutputTokens: 1024,
     })
 
     try {

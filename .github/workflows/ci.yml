@@ -33,7 +33,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - run: npm ci
-      - run: npx jest --testPathPattern=tests/unit --passWithNoTests
+      - run: npx jest tests/unit --passWithNoTests
 
   build:
     name: Build

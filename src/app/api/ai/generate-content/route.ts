@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
     if (!title?.trim()) return badRequest('title is required')
 
     const topicContext = category ? `in the domain of "${category}"` : ''
-    const courseContext = courseTitle ? `for the course "${courseTitle}"` : ''
 
     const { text } = await generateText({
       model: groqFlash,
@@ -49,7 +48,7 @@ One hands-on, practical exercise that requires the student to apply the concepts
 
 Use proper Markdown: use \`\`\`language\`\`\` blocks for code, **bold** for key terms, and bullet lists where appropriate.
 Return ONLY the markdown content, no preamble or trailing commentary.`,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     return ok({ content: text.trim() })
