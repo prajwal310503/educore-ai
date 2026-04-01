@@ -1,16 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { auth } from '@/lib/auth'
+import { NextResponse } from 'next/server'
 
-export async function middleware(req: NextRequest) {
+export default auth((req) => {
   const { pathname } = req.nextUrl
-
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  })
-
-  const isLoggedIn = !!token
-  const role = token?.role as string | undefined
+  const session = req.auth
+  const isLoggedIn = !!session
+  const role = session?.user?.role as string | undefined
 
   const authPages = ['/login', '/register']
   const isAuthPage = authPages.some(p => pathname.startsWith(p))
@@ -38,7 +33,7 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next()
-}
+})
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'],
